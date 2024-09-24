@@ -32,10 +32,12 @@ Changelog
 
 * 7/27/16 - Converted all domains to the second level. This means that starting from [this commit](https://github.com/martenson/disposable-email-domains/commit/61ae67aacdab0b19098de2e13069d7c35b74017a) the implementers should take care of matching the second level domain names properly i.e. `@xxx.yyy.zzz` should match `yyy.zzz` in blocklist more info in [#46](https://github.com/martenson/disposable-email-domains/issues/46)
 
+* 9/2/14 - First commit [393c21f5](https://github.com/disposable-email-domains/disposable-email-domains/commit/393c21f56b5186f8db7d197b11cf1d7c5490a6f9)
+  
 Example Usage
 =============
 
-TOC: [Python](#python), [PHP](#php), [Go](#go), [Ruby on Rails](#ruby-on-rails), [NodeJS](#nodejs), [C#](#c), [bash](#bash), [Java](#java)
+TOC: [Python](#python), [PHP](#php), [Go](#go), [Ruby on Rails](#ruby-on-rails), [NodeJS](#nodejs), [C#](#c), [bash](#bash), [Java](#java), [Swift](#swift)
 
 ### Python
 ```Python
@@ -114,8 +116,6 @@ def reject_email_blocklist
 end
 ```
 
-Alternatively you can use the `disposable_mail` gem: https://github.com/oesgalha/disposable_mail.
-
 ### Node.js
 contributed by [@boywithkeyboard](https://github.com/boywithkeyboard)
 
@@ -134,6 +134,8 @@ async function isDisposable(email) {
   return blocklist.includes(email.split('@')[1])
 }
 ```
+
+Alternatively check out NPM package https://github.com/mziyut/disposable-email-domains-js.
 
 ### C#
 ```C#
@@ -212,5 +214,29 @@ public static boolean isDisposable(InternetAddress contact) throws AddressExcept
     int domainSep = address.indexOf('@');
     String domain = (domainSep >= 0) ? address.substring(domainSep + 1) : address;
     return DISPOSABLE_EMAIL_DOMAINS.contains(domain);
+}
+```
+
+### Swift
+contributed by [@1998code](https://github.com/1998code)
+
+```swift
+func checkBlockList(email: String, completion: @escaping (Bool) -> Void) {
+    let url = URL(string: "https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf")!
+    let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        if let data = data {
+            if let string = String(data: data, encoding: .utf8) {
+                let lines = string.components(separatedBy: "\n")
+                for line in lines {
+                    if email.contains(line) {
+                        completion(true)
+                        return
+                    }
+                }
+            }
+        }
+        completion(false)
+    }
+    task.resume()
 }
 ```
